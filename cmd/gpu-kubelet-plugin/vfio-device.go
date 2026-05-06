@@ -29,14 +29,6 @@ import (
 	"k8s.io/klog/v2"
 )
 
-// Environment variable to enable toggling of GPU persistence mode during
-// vfio device preparation. This should be set if toggling of GPU persistence mode
-// is needed. When enabled, the GPU persistence mode will be disabled during
-// vfio device preparation and it will be set to legacy persistence mode during
-// vfio device unpreparation.
-// Note: Without setting this, vfio device preparation would break if
-// nvidia-persistenced is running.
-
 const (
 	kernelIommuGroupPath         = "/sys/kernel/iommu_groups"
 	vfioPciModule                = "vfio_pci"
