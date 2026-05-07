@@ -142,6 +142,10 @@ _wait_for_new_leader() {
 
   [ "$new_leader_pod" != "$leader_pod" ]
 
+  kubectl wait --for=condition=Ready pod "$new_leader_pod" \
+    -n dra-driver-nvidia-gpu \
+    --timeout=20s
+
   run kubectl get pod "$new_leader_pod" \
     -n dra-driver-nvidia-gpu \
     -o jsonpath='{.status.phase}'
