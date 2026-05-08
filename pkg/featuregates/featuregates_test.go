@@ -23,11 +23,20 @@ import (
 	"github.com/stretchr/testify/require"
 	utilversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/component-base/featuregate"
+	logsapi "k8s.io/component-base/logs/api/v1"
 )
 
 // TestVersion is a high version used in tests to ensure all feature gates are visible
 // regardless of the actual project version being tested.
 var TestVersion = utilversion.MajorMinor(999, 999)
+
+func TestNewFeatureGatesWithKubeEmulationDoesNotPanic(t *testing.T) {
+	require.NotPanics(t, func() {
+		_ = newFeatureGates(featureGateEmulationVersion)
+	})
+	fg := newFeatureGates(featureGateEmulationVersion)
+	require.True(t, fg.Enabled(logsapi.ContextualLogging))
+}
 
 // Test feature gates covering all lifecycle stages
 // These are completely fake features used only for testing - no real feature gate values are used.

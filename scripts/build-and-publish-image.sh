@@ -23,7 +23,7 @@ if [[ -z ${IMG_PREFIX:-} ]]; then
 fi
 
 if [[ -z ${IMG_TAG:-} ]]; then
-	# Match versions.mk VERSION_W_COMMIT (e.g. v25.8.0-dev-f2eaddd6) for release
+	# Match versions.mk VERSION_W_COMMIT (e.g. v0.4.0-dev-f2eaddd6) for release
 	# commits, use the exact git tag as the image tag.
 	if git describe --exact-match --tags HEAD >/dev/null 2>&1; then
 		IMG_TAG=$(git describe --exact-match --tags HEAD)

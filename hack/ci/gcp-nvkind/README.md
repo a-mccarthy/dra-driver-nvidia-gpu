@@ -43,7 +43,7 @@ the full env. `TESTINFRA_DIR` points `e2e-test.sh` at the shared lib under
 
 ## Notable pins and caveats
 
-- `registry.k8s.io/dra-driver-nvidia/dra-driver-nvidia-gpu:v26.4.0-dev` is
+- `registry.k8s.io/dra-driver-nvidia/dra-driver-nvidia-gpu:v0.4.0-dev` is
   not published; `install-dra-driver.sh` builds from source and
   `kind load docker-image`s the result.
 - `kindest/node:v1.34.3` (DRA GA). `v1.34.1` is not published on Docker Hub.

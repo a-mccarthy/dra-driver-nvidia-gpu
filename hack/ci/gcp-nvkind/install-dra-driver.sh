@@ -16,7 +16,7 @@
 # install-dra-driver.sh -- build + kind-load + helm install on the VM.
 #
 # The chart's default image ref (registry.k8s.io/dra-driver-nvidia/...) has
-# no published v26.4.0-dev tag, so this builds from the checked-out source
+# no published v0.4.0-dev tag, so this builds from the checked-out source
 # and side-loads the resulting image into the kind cluster.
 
 set -o errexit
