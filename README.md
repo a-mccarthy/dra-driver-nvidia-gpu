@@ -26,14 +26,14 @@ An individual `ComputeDomain` (CD) guarantees MNNVL-reachability between pods th
 
 In terms of placement, a CD follows the workload. In terms of lifetime, a CD is ephemeral: its lifetime is bound to the lifetime of the consuming workload.
 For more background on how `ComputeDomain`s facilitate orchestrating MNNVL workloads on Kubernetes (and on NVIDIA GB200 systems in particular), see [this](https://docs.google.com/document/d/1PrdDofsPFVJuZvcv-vtlI9n2eAh-YVf_fRQLIVmDwVY/edit?tab=t.0#heading=h.qkogm924v5so) doc and [this](https://docs.google.com/presentation/d/1Xupr8IZVAjs5bNFKJnYaK0LE7QWETnJjkz6KOfLu87E/edit?pli=1&slide=id.g28ac369118f_0_1647#slide=id.g28ac369118f_0_1647) slide deck.
-For an outlook and specific plans for improvements, please refer to [these](https://github.com/kubernetes-sigs/dra-driver-nvidia-gpu/releases/tag/v25.3.0-rc.3) release notes.
+For an outlook and specific plans for improvements, please refer to the [project releases](https://github.com/kubernetes-sigs/dra-driver-nvidia-gpu/releases).
 
 If you've heard about IMEX: this DRA driver orchestrates IMEX primitives (daemons, domains, channels) under the hood.
 
 ### `GPU`s
 
 The GPU allocation side of this DRA driver [will enable powerful features](https://docs.google.com/document/d/1BNWqgx_SmZDi-va_V31v3DnuVwYnF2EmN7D-O_fB6Oo) (such as dynamic allocation of MIG devices).
-To learn about what we're planning to build, please have a look at [these](https://github.com/kubernetes-sigs/dra-driver-nvidia-gpu/releases/tag/v25.3.0-rc.3) release notes.
+To learn about what we're planning to build, please have a look at the [project releases](https://github.com/kubernetes-sigs/dra-driver-nvidia-gpu/releases).
 
 While some GPU allocation features can be tried out, they are not yet officially supported.
 Hence, the GPU kubelet plugin is currently disabled by default in the Helm chart installation.

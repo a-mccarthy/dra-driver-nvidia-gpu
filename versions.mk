@@ -41,10 +41,10 @@ BUILDIMAGE ?=  $(DRIVER_NAME):$(BUILDIMAGE_TAG)
 GIT_COMMIT ?= $(shell git describe --match="" --dirty --long --always --abbrev=40 2> /dev/null || echo "")
 GIT_COMMIT_SHORT ?= $(shell git rev-parse --short=8 HEAD)
 
-# Shape: v25.8.0-dev-f2eaddd6
+# Shape: v0.4.0-dev-f2eaddd6
 VERSION_W_COMMIT = $(VERSION)-$(GIT_COMMIT_SHORT)
 
-# Shape: 25.8.0-dev-f2eaddd6-chart (no leading v)
+# Shape: 0.4.0-dev-f2eaddd6-chart (no leading v)
 VERSION_STAGING_CHART ?= $(VERSION_W_COMMIT:v%=%)-chart
 VERSION_GHCR_CHART ?= $(VERSION_STAGING_CHART)
 

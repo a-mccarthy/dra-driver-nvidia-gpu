@@ -59,8 +59,8 @@ body:
     id: driver-version
     attributes:
       label: DRA Driver Version
-      description: "Version of the NVIDIA DRA Driver (e.g., v25.8.0). Run: `helm list -n <namespace>`"
-      placeholder: "e.g., v25.6.0"
+      description: "Version of the NVIDIA DRA Driver (e.g., v0.4.0). Run: `helm list -n <namespace>`"
+      placeholder: "e.g., v0.4.0"
     validations:
       required: true
 

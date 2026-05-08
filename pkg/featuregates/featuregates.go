@@ -18,16 +18,31 @@ package featuregates
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/component-base/featuregate"
 	logsapi "k8s.io/component-base/logs/api/v1"
-
-	"sigs.k8s.io/dra-driver-nvidia-gpu/internal/info"
 )
+
+// featureGateEmulationVersion is the version passed to component-base's versioned
+// feature gate. It must use Kubernetes-style versions (major.minor matching the
+// Kubernetes release line), not the driver SemVer from VERSION.
+//
+// k8s.io/component-base/logs registers gates such as ContextualLogging at v1.24+
+// / v1.30+. If emulation were driver v0.4, those specs compare as "newer than"
+// emulation and the gate falls through to PreAlpha, which makes SetFromMap panic.
+//
+// Driver-local gates below use 0.x Version fields, they remain visible because
+// 0.x < 1.y under apimachinery version ordering.
+//
+// Keep this major.minor aligned with the Kubernetes release we vendor in go.mod
+// (k8s.io/* modules) and bump it whenever those dependencies move to a new kube minor.
+//
+// TODO: optionally isolate driver-only gates in their own registry so emulation can
+// stay purely on driver SemVer without sharing a single version stream with component-base.
+var featureGateEmulationVersion = version.MajorMinor(1, 36)
 
 const (
 	// TimeSlicingSettings allows timeslicing settings to be customized.
@@ -61,6 +76,12 @@ const (
 	DeviceMetadata featuregate.Feature = "DeviceMetadata"
 )
 
+// Feature gate Version fields use driver SemVer major.minor.
+// Former calendar-based release lines map to SemVer minors for reference when
+// adding new VersionedSpecs or backport notes:
+//   ~25.3 -> 0.1, ~25.8 -> 0.2, ~25.12 -> 0.3, ~26.4 -> 0.4
+//
+
 // defaultFeatureGates contains the default settings for all project-specific feature gates.
 // These will be registered with the standard Kubernetes feature gate system.
 var defaultFeatureGates = map[featuregate.Feature]featuregate.VersionedSpecs{
@@ -68,63 +89,63 @@ var defaultFeatureGates = map[featuregate.Feature]featuregate.VersionedSpecs{
 		{
 			Default:    false,
 			PreRelease: featuregate.Alpha,
-			Version:    version.MajorMinor(25, 8),
+			Version:    version.MajorMinor(0, 2),
 		},
 	},
 	MPSSupport: {
 		{
 			Default:    false,
 			PreRelease: featuregate.Alpha,
-			Version:    version.MajorMinor(25, 8),
+			Version:    version.MajorMinor(0, 2),
 		},
 	},
 	IMEXDaemonsWithDNSNames: {
 		{
 			Default:    true,
 			PreRelease: featuregate.Beta,
-			Version:    version.MajorMinor(25, 8),
+			Version:    version.MajorMinor(0, 2),
 		},
 	},
 	PassthroughSupport: {
 		{
 			Default:    false,
 			PreRelease: featuregate.Alpha,
-			Version:    version.MajorMinor(25, 12),
+			Version:    version.MajorMinor(0, 3),
 		},
 	},
 	DynamicMIG: {
 		{
 			Default:    false,
 			PreRelease: featuregate.Alpha,
-			Version:    version.MajorMinor(25, 12),
+			Version:    version.MajorMinor(0, 3),
 		},
 	},
 	NVMLDeviceHealthCheck: {
 		{
 			Default:    false,
 			PreRelease: featuregate.Alpha,
-			Version:    version.MajorMinor(25, 12),
+			Version:    version.MajorMinor(0, 3),
 		},
 	},
 	ComputeDomainCliques: {
 		{
 			Default:    true,
 			PreRelease: featuregate.Beta,
-			Version:    version.MajorMinor(25, 12),
+			Version:    version.MajorMinor(0, 3),
 		},
 	},
 	CrashOnNVLinkFabricErrors: {
 		{
 			Default:    true,
 			PreRelease: featuregate.Beta,
-			Version:    version.MajorMinor(25, 12),
+			Version:    version.MajorMinor(0, 3),
 		},
 	},
 	DeviceMetadata: {
 		{
 			Default:    false,
 			PreRelease: featuregate.Alpha,
-			Version:    version.MajorMinor(26, 4),
+			Version:    version.MajorMinor(0, 4),
 		},
 	},
 }
@@ -140,17 +161,10 @@ var (
 func FeatureGates() featuregate.MutableVersionedFeatureGate {
 	if featureGates == nil {
 		featureGatesOnce.Do(func() {
-			featureGates = newFeatureGates(parseProjectVersion())
+			featureGates = newFeatureGates(featureGateEmulationVersion)
 		})
 	}
 	return featureGates
-}
-
-// parseProjectVersion parses the project version string and returns major.minor version.
-func parseProjectVersion() *version.Version {
-	versionStr := info.GetVersionParts()[0]
-	v := version.MustParse(strings.TrimPrefix(versionStr, "v"))
-	return version.MajorMinor(v.Major(), v.Minor())
 }
 
 // newFeatureGates instantiates a new set of feature gates with both standard Kubernetes
