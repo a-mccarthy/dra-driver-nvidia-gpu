@@ -145,7 +145,7 @@ func NewDeviceState(ctx context.Context, config *Config) (*DeviceState, error) {
 				return nil, fmt.Errorf("unable to get checkpoint: %w", err)
 			}
 			storedBootID := cp.GetNodeBootID()
-			if storedBootID == "" {
+			if storedBootID == "" { //nolint:gocritic,staticcheck
 				// legacy checkpoint file does not contain a boot ID, inject current boot ID
 				// note: this is a temporary workaround to ensure that the checkpoint file is always updated with the current boot ID
 				// note: this will temporary break the assertion that its prepared devices are prepared by the same boot ID
