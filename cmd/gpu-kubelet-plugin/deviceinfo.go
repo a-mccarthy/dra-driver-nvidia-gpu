@@ -31,6 +31,7 @@ import (
 type GpuInfo struct {
 	UUID                  string `json:"uuid"`
 	minor                 int
+	migCapable            bool
 	migEnabled            bool
 	vfioEnabled           bool
 	memoryBytes           uint64

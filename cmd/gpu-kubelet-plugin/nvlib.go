@@ -463,10 +463,17 @@ func (l deviceLib) getGpuInfo(index int, device nvdev.Device) (*GpuInfo, error) 
 	if ret != nvml.SUCCESS {
 		return nil, fmt.Errorf("error getting UUID for device %d: %v", index, ret)
 	}
+
+	migCapable, err := device.IsMigCapable()
+	if err != nil {
+		return nil, fmt.Errorf("error checking MIG capability for device %d: %w", index, err)
+	}
+
 	migEnabled, err := device.IsMigEnabled()
 	if err != nil {
 		return nil, fmt.Errorf("error checking if MIG mode enabled for device %d: %w", index, err)
 	}
+
 	memory, ret := device.GetMemoryInfo()
 	if ret != nvml.SUCCESS {
 		return nil, fmt.Errorf("error getting memory info for device %d: %v", index, ret)
@@ -583,6 +590,7 @@ func (l deviceLib) getGpuInfo(index int, device nvdev.Device) (*GpuInfo, error) 
 	gpuInfo := &GpuInfo{
 		UUID:                  uuid,
 		minor:                 minor,
+		migCapable:            migCapable,
 		migEnabled:            migEnabled,
 		memoryBytes:           memory.Total,
 		productName:           productName,
@@ -1453,6 +1461,11 @@ func supportsMIGModeToggle(dev nvml.Device) bool {
 }
 
 func isDynamicMIGCapable(gpuInfo *GpuInfo, dev nvdev.Device) (bool, error) {
+	if !gpuInfo.migCapable {
+		klog.Warningf("GPU %s: hardware does not support MIG - skipping DynamicMIG", gpuInfo.String())
+		return false, nil
+	}
+
 	vMode, vret := dev.GetVirtualizationMode()
 	if vret != nvml.SUCCESS {
 		return false, fmt.Errorf("error getting GPU virtualization mode: %v", vret)
