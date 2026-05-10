@@ -27,6 +27,9 @@ jobs:
   variables:
     uses: ./.github/workflows/variables.yaml
 
+  helm:
+    uses: ./.github/workflows/helm.yaml
+
   golang:
     needs:
     - variables
