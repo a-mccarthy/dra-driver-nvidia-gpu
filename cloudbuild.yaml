@@ -3,13 +3,21 @@
 # Invoked by Kubernetes Prow (image-builder) on merges/tags; see
 # config/jobs/image-pushing/k8s-staging-dra-driver-nvidia-gpu.yaml in kubernetes/test-infra.
 # Image tags follow versions.mk VERSION_W_COMMIT (not image-builder _GIT_TAG).
+# Publishes the container image, then the Helm chart to OCI.
 
 timeout: 7200s
 options:
   substitutionOption: ALLOW_LOOSE
 steps:
-  - name: gcr.io/k8s-staging-test-infra/gcb-docker-gcloud:v20260127-c1affcc8de
-    entrypoint: ./scripts/build-and-publish-image.sh
+  - id: publish-image
+    name: gcr.io/k8s-staging-test-infra/gcb-docker-gcloud:v20260127-c1affcc8de
+    entrypoint: ./hack/build-and-publish-image.sh
+    env:
+      - IMG_PREFIX=us-central1-docker.pkg.dev/k8s-staging-images/dra-driver-nvidia
+      - GIT_COMMIT=${_PULL_BASE_SHA}
+  - id: publish-chart
+    name: gcr.io/k8s-staging-test-infra/gcb-docker-gcloud:v20260127-c1affcc8de
+    entrypoint: ./hack/build-and-publish-chart.sh
     env:
       - IMG_PREFIX=us-central1-docker.pkg.dev/k8s-staging-images/dra-driver-nvidia
       - GIT_COMMIT=${_PULL_BASE_SHA}
