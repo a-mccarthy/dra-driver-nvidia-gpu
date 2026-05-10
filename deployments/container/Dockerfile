@@ -86,25 +86,17 @@ RUN --mount=type=cache,target=/mc/go/build-cache,id=gocache \
     case "$TARGETARCH" in "$BUILDARCH") cc=gcc;; arm64) cc=aarch64-linux-gnu-gcc;; amd64) cc=x86_64-linux-gnu-gcc;; esac && \
     time make CC=${cc} GOARCH=${TARGETARCH} PREFIX=/artifacts cmds
 
-# Build static bash binary (against musl). Notes: cross-compilation isn't robust
-# (see non-deterministic segfaults tracked in issues/502; source code download
-# instabilities tracked in issues/743) and generally takes signifiant time even
-# on happy path (dominiates CI duration as of the time of writing). Do not build
-# this every time. Instead, consume it from a previous image in a registry -- also,
-# leave machinery (out-commented) in place.
-#
-# Choose: 1) fresh bash build or 2) use binary from previous image
-#
-# option 1:
-ARG BASH_STATIC_GIT_REF=021f5f29f665c92ca16a369d9f27e288c3aed0c6
-ENV BASH_STATIC_GIT_REF=${BASH_STATIC_GIT_REF}
-WORKDIR /bashbuild
-COPY hack/build-bash-static.sh .
-RUN bash /bashbuild/build-bash-static.sh
-RUN cd /bashbuild/bash-static/releases && ./bash*-static --version && mv bash-*-static /bashbuild/bash && file /bashbuild/bash
-
-# option 2:
-# FROM registry.k8s.io/dra-driver-nvidia/dra-driver-nvidia-gpu:v25.12.0-dev-839e966a AS bash
+# Static bash binary, sourced from the Debian 'bash-static' package on
+# trixie. Replaces a from-source build that was flaky in CI (autoconf
+# availability, GNU mirror instability, cross-compile segfaults; see
+# issues/502 and issues/743) and dominated CI duration on the happy
+# path. Pinned by image digest for reproducibility; bash version follows
+# the trixie suite. Currently delivers bash 5.2.37, statically linked.
+FROM debian:trixie-slim@sha256:109e2c65005bf160609e4ba6acf7783752f8502ad218e298253428690b9eaa4b AS bash
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends bash-static \
+ && rm -rf /var/lib/apt/lists/* \
+ && /bin/bash-static --version
 
 # Pull the nvidia-cdi-hook binary out of the relevant toolkit container
 # (arch: TARGETPLATFORM, set via --platform).
@@ -137,11 +129,7 @@ LABEL org.opencontainers.image.source="https://github.com/kubernetes-sigs/dra-dr
 # Add top-level license (AL2) file into the container image
 COPY LICENSE /
 
-# option 1: fresh bash build
-COPY --from=build   /bashbuild/bash                           /bin/bash
-
-# option 2: bash from previous image
-# COPY --from=bash    /bin/bash                                 /bin/bash
+COPY --from=bash    /bin/bash-static                          /bin/bash
 
 COPY --from=toolkit /artifacts/rpm/usr/bin/nvidia-cdi-hook    /usr/bin/nvidia-cdi-hook
 COPY --from=build   /artifacts/compute-domain-controller      /usr/bin/compute-domain-controller
