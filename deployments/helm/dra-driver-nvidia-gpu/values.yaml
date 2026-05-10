@@ -57,7 +57,7 @@ resourceApiVersion: ""
 
 imagePullSecrets: []
 image:
-  repository: us-central1-docker.pkg.dev/k8s-staging-images/dra-driver-nvidia/dra-driver-nvidia-gpu
+  repository: registry.k8s.io/dra-driver-nvidia/dra-driver-nvidia-gpu
   pullPolicy: IfNotPresent
   # Note: an empty string is translated to the `appVersion` string from
   # the Helm chart YAML (effectively implementing the default value to be

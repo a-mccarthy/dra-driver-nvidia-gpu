@@ -36,4 +36,4 @@ GPU-aware variant: [`demo/clusters/nvkind/`](../demo/clusters/nvkind). GKE recip
 
 ## CI
 
-GitHub Actions in [`.github/workflows/`](../.github/workflows) run lint, codegen check, unit tests, build, chart lint, and CodeQL. End-to-end GPU tests run on Prow / Lambda Cloud — see [`hack/ci/lambda/e2e-test.sh`](../hack/ci/lambda/e2e-test.sh).
+GitHub Actions in [`.github/workflows/`](../.github/workflows) run lint, codegen check, unit tests, build, Helm chart lint, and CodeQL. Container image and Helm chart publishing run in Prow / Cloud Build. End-to-end GPU tests run on Prow / Lambda Cloud — see [`hack/ci/lambda/e2e-test.sh`](../hack/ci/lambda/e2e-test.sh).

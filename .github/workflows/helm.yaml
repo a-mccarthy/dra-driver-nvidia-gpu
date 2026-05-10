@@ -12,22 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: ci
+# Helm chart lint only. Chart package/publish runs in Prow / Cloud Build.
+name: helm
 
 on:
-  push:
-    branches:
-      - main
-      - release-*
-  pull_request:
-    branches:
-      - main
-      - release-*
+  workflow_call:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
-  basic:
-    uses: ./.github/workflows/basic-checks.yaml
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        name: checkout
+      - name: Install Helm
+        run: |
+          curl -sSfLO --retry 8 --retry-all-errors --connect-timeout 10 --retry-delay 5 \
+            https://get.helm.sh/helm-v3.18.6-linux-amd64.tar.gz
+          tar -zxvf helm-v3*amd64.tar.gz && sudo mv linux-amd64/helm /usr/local/bin/helm
+      - name: helm lint
+        run: make helm-lint
