@@ -47,17 +47,21 @@ if ! command -v helm >/dev/null 2>&1; then
 	curl -sSfLO --retry 8 --retry-all-errors --connect-timeout 10 --retry-delay 5 \
 		https://get.helm.sh/helm-v3.18.6-linux-amd64.tar.gz
 	tar -zxvf helm-v3*linux-amd64.tar.gz
-	sudo mv linux-amd64/helm /usr/local/bin/helm
+	mv linux-amd64/helm /usr/local/bin/helm
 fi
 
 mkdir -p "${DIST_DIR}"
 rm -f "${DIST_DIR}/${DRIVER_NAME}-"*.tgz
 
-# Staging image registry for charts built in CI / Cloud Build.
+# Staging image registry swap for non-release builds only. Tagged (release) builds
+# keep registry.k8s.io/dra-driver-nvidia in values.yaml for promoted charts.
 VALUES="${REPO_ROOT}/deployments/helm/${DRIVER_NAME}/values.yaml"
-sed -i 's|registry.k8s.io/dra-driver-nvidia|us-central1-docker.pkg.dev/k8s-staging-images/dra-driver-nvidia|g' "${VALUES}"
-rm -f "${VALUES}.bak"
-git diff || echo "ignore git diff exit code"
+if git describe --exact-match --tags HEAD >/dev/null 2>&1; then
+	echo "Tagged release build: skipping staging registry rewrite in values.yaml"
+else
+	sed -i 's|registry.k8s.io/dra-driver-nvidia|us-central1-docker.pkg.dev/k8s-staging-images/dra-driver-nvidia|g' "${VALUES}"
+	git diff || echo "ignore git diff exit code"
+fi
 
 "${HELM}" package "deployments/helm/${DRIVER_NAME}" \
 	--version "${CHART_VERSION}" \
