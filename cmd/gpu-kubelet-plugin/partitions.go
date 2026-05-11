@@ -32,9 +32,12 @@ type PartCapacityMap map[resourceapi.QualifiedName]resourceapi.DeviceCapacity
 // dispatched separately (feature-gate-gated in publishResources()), so
 // without a shared helper they may silently drift.
 func (d *GpuInfo) fullGpuCapacity() PartCapacityMap {
+	if d.memoryBytes == nil {
+		return nil
+	}
 	return PartCapacityMap{
 		"memory": resourceapi.DeviceCapacity{
-			Value: *resource.NewQuantity(int64(d.memoryBytes), resource.BinarySI),
+			Value: *resource.NewQuantity(int64(*d.memoryBytes), resource.BinarySI),
 		},
 	}
 }

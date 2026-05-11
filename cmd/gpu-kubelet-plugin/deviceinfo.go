@@ -34,7 +34,7 @@ type GpuInfo struct {
 	migCapable            bool
 	migEnabled            bool
 	vfioEnabled           bool
-	memoryBytes           uint64
+	memoryBytes           *uint64
 	productName           string
 	brand                 string
 	architecture          string
