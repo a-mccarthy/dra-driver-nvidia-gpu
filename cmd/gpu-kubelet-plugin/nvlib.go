@@ -474,10 +474,19 @@ func (l deviceLib) getGpuInfo(index int, device nvdev.Device) (*GpuInfo, error) 
 		return nil, fmt.Errorf("error checking if MIG mode enabled for device %d: %w", index, err)
 	}
 
+	var memoryBytes *uint64
 	memory, ret := device.GetMemoryInfo()
-	if ret != nvml.SUCCESS {
+	switch ret {
+	case nvml.SUCCESS:
+		memoryBytes = &(memory.Total)
+	case nvml.ERROR_NOT_SUPPORTED:
+		memoryBytes = nil
+		klog.Warningf("ignoring %v for getting memory info for device %d", ret, index)
+	default:
 		return nil, fmt.Errorf("error getting memory info for device %d: %v", index, ret)
+
 	}
+
 	productName, ret := device.GetName()
 	if ret != nvml.SUCCESS {
 		return nil, fmt.Errorf("error getting product name for device %d: %v", index, ret)
@@ -592,7 +601,7 @@ func (l deviceLib) getGpuInfo(index int, device nvdev.Device) (*GpuInfo, error) 
 		minor:                 minor,
 		migCapable:            migCapable,
 		migEnabled:            migEnabled,
-		memoryBytes:           memory.Total,
+		memoryBytes:           memoryBytes,
 		productName:           productName,
 		brand:                 brand,
 		architecture:          architecture,
