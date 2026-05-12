@@ -290,19 +290,31 @@ kubeletPlugin:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          # On discrete-GPU based systems NFD adds the following label where 10de is the NVIDIA PCI vendor ID
+          # NFD: On discrete-GPU based systems NFD adds the following label where 10de is the NVIDIA PCI vendor ID
           - key: feature.node.kubernetes.io/pci-10de.present
             operator: In
             values:
             - "true"
         - matchExpressions:
-          # On some Tegra-based systems NFD detects the CPU vendor ID as NVIDIA
+          # NFD: NVIDIA PCI 3D controller (class 0302) present
+          - key: feature.node.kubernetes.io/pci-0302_10de.present
+            operator: In
+            values:
+            - "true"
+        - matchExpressions:
+          # NFD: NVIDIA PCI VGA compatible controller (class 0300) present
+          - key: feature.node.kubernetes.io/pci-0300_10de.present
+            operator: In
+            values:
+            - "true"
+        - matchExpressions:
+          # NFD: On some Tegra-based systems NFD detects the CPU vendor ID as NVIDIA
           - key: feature.node.kubernetes.io/cpu-model.vendor_id
             operator: In
             values:
             - "NVIDIA"
         - matchExpressions:
-          # We allow a GPU deployment to be forced by setting the following label to "true"
+          # GPU Operator: Label added by NVIDIA GPU Operator when it detects a GPU
           - key: "nvidia.com/gpu.present"
             operator: In
             values:
