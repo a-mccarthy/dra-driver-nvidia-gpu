@@ -12,7 +12,10 @@ and is built with [Hugo](https://gohugo.io/) (the extended build) and the
 
 ## Quick start
 
-You need an extended Hugo build, Go, Node.js, and Git installed.
+You need [Hugo (extended)](https://gohugo.io/installation/),
+[Go](https://go.dev/doc/install), [Node.js](https://nodejs.org/) (which
+provides `npm`), and [Git](https://git-scm.com/downloads) installed. The versions on your machine should meed the minium required versions listed in
+[`netlify.toml`](https://github.com/kubernetes-sigs/dra-driver-nvidia-gpu/blob/main/netlify.toml).
 
 ```bash
 git clone https://github.com/kubernetes-sigs/dra-driver-nvidia-gpu.git
