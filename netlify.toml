@@ -1,10 +1,10 @@
 [build]
   base    = "site"
-  publish = "site/public"
+  publish = "public"
   command = "npm ci && hugo --gc --minify"
 
 [build.environment]
-  HUGO_VERSION = "0.139.0"
+  HUGO_VERSION = "0.157.0"
   GO_VERSION   = "1.25.0"
   NODE_VERSION = "20"
   GIT_DEPTH    = "0"
