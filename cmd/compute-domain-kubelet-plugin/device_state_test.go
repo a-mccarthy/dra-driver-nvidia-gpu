@@ -372,7 +372,7 @@ func TestAssertImexChannelNotAllocated(t *testing.T) {
 }
 
 func TestPrepareReturnsCheckpointedDevicesForCompletedClaim(t *testing.T) {
-	expectedDevice := kubeletplugin.Device{
+	expectedDevice := CheckpointedDevice{
 		Requests:     []string{"request"},
 		PoolName:     "pool",
 		DeviceName:   "channel-0",
@@ -403,7 +403,7 @@ func TestPrepareReturnsCheckpointedDevicesForCompletedClaim(t *testing.T) {
 	got, err := state.Prepare(context.Background(), claim)
 
 	require.NoError(t, err)
-	assert.Equal(t, []kubeletplugin.Device{expectedDevice}, got)
+	assert.Equal(t, []kubeletplugin.Device{kubeletplugin.Device(expectedDevice)}, got)
 }
 
 func TestUnprepareMissingClaimIsNoop(t *testing.T) {
