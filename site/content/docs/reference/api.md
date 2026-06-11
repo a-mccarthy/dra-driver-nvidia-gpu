@@ -1,14 +1,22 @@
-# API reference
+---
+title: API reference
+linkTitle: API reference
+weight: 10
+description: Types and fields for the resource.nvidia.com/v1beta1 API group.
+---
 
 All types belong to API group `resource.nvidia.com/v1beta1`.
 
 ## GPU opaque configuration types
 
-These types are set as opaque configuration in `ResourceClaim` and `ResourceClaimTemplate` specs to configure GPU resources. They are optional, omit them to use device defaults.
+These types are set as opaque configuration in `ResourceClaim` and `ResourceClaimTemplate` specs to configure GPU resources. 
+They are optional, omit them to use driver defaults.
+Some fields required feature gates to be enabled before using.
 
 ### GpuConfig
 
-Configures a full GPU device. Target DeviceClass: `gpu.nvidia.com`.
+Configures a full GPU device. 
+Target DeviceClass: `gpu.nvidia.com`.
 
 With time-slicing:
 
@@ -84,14 +92,25 @@ sharing:
 
 ### VfioDeviceConfig
 
-Configures a VFIO passthrough device. Target DeviceClass: `vfio.gpu.nvidia.com`. No additional fields beyond the type metadata.
+Configures a VFIO passthrough device. Target DeviceClass: `vfio.gpu.nvidia.com`.
 
 ```yaml
 apiVersion: resource.nvidia.com/v1beta1
 kind: VfioDeviceConfig
+iommu:
+  backendPolicy: LegacyOnly   # LegacyOnly | PreferIommuFD
+  enableAPIDevice: false       # optional
 ```
 
-> Requires [`PassthroughSupport`](feature-gates.md) (Alpha, default: false).
+#### Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `iommu` | object | Optional. IOMMU backend configuration. Omit to use defaults (`LegacyOnly`, API device disabled). |
+| `iommu.backendPolicy` | string | `LegacyOnly` (default) or `PreferIommuFD`. Selects the IOMMU backend used for device passthrough. |
+| `iommu.enableAPIDevice` | bool | Optional. Expose `/dev/iommu` or `/dev/vfio/vfio` to the workload. Defaults to `false`. Requires the [`DeviceMetadata`](feature-gates.md) feature gate. |
+
+> Requires [`PassthroughSupport`](feature-gates.md) (Alpha, default: false). `iommu.enableAPIDevice` additionally requires [`DeviceMetadata`](feature-gates.md) (Alpha, default: false).
 
 ## ComputeDomain CRDs
 
